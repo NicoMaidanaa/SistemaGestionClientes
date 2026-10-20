@@ -72,7 +72,19 @@ if (isset($_GET['editar'])) {
 }
 
 // 4. Obtener todos los clientes
-$clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$// 4. Obtener clientes (con búsqueda opcional)
+$busqueda = trim($_GET['buscar'] ?? '');
+
+if ($busqueda !== '') {
+    $stmt = $db->prepare("SELECT * FROM clientes
+        WHERE nombre LIKE ? OR email LIKE ? OR telefono LIKE ?
+        ORDER BY id DESC");
+    $like = "%$busqueda%";
+    $stmt->execute([$like, $like, $like]);
+    $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -224,7 +236,13 @@ $clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO:
         .vacio {
             text-align: center;
             padding: 30px;
-            color: #888;
+            color: #888;}
+        form.buscador {
+            display: flex;
+            grid-template-columns: none;
+            gap: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -267,7 +285,14 @@ $clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO:
                 <?php endif; ?>
             </div>
         </form>
-
+        <form method="GET" class="buscador">
+            <input type="text" name="buscar" placeholder="Buscar por nombre, email o telefono..."
+                value="<?= htmlspecialchars($busqueda) ?>">
+            <button type="submit">Buscar</button>
+            <?php if ($busqueda !== ''): ?>
+                <a href="index.php"><button type="button" class="cancelar">Limpiar</button></a>
+            <?php endif; ?>
+        </form>
         <!-- Tabla de clientes -->
         <h2 style="margin-bottom: 10px;">Listado de Clientes (<?= count($clientes) ?>)</h2>
 
@@ -301,7 +326,11 @@ $clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO:
                 </tbody>
             </table>
         <?php else: ?>
-            <div class="vacio">No hay clientes registrados. Agrega el primero!</div>
+            <div class="vacio">
+                <?= $busqueda !== ''
+                    ? 'No se encontraron clientes para "' . htmlspecialchars($busqueda) . '"'
+                    : 'No hay clientes registrados. Agrega el primero!' ?>
+            </div>
         <?php endif; ?>
     </div>
 </body>
