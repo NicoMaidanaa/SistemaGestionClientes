@@ -72,7 +72,7 @@ if (isset($_GET['editar'])) {
 }
 
 // 4. Obtener todos los clientes
-$// 4. Obtener clientes (con búsqueda opcional)
+// 4. Obtener clientes (con búsqueda opcional)
 $busqueda = trim($_GET['buscar'] ?? '');
 
 if ($busqueda !== '') {
@@ -236,7 +236,9 @@ if ($busqueda !== '') {
         .vacio {
             text-align: center;
             padding: 30px;
-            color: #888;}
+            color: #888;
+        }
+
         form.buscador {
             display: flex;
             grid-template-columns: none;
