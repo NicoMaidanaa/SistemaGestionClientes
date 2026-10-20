@@ -72,7 +72,19 @@ if (isset($_GET['editar'])) {
 }
 
 // 4. Obtener todos los clientes
-$clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$// 4. Obtener clientes (con búsqueda opcional)
+$busqueda = trim($_GET['buscar'] ?? '');
+
+if ($busqueda !== '') {
+    $stmt = $db->prepare("SELECT * FROM clientes
+        WHERE nombre LIKE ? OR email LIKE ? OR telefono LIKE ?
+        ORDER BY id DESC");
+    $like = "%$busqueda%";
+    $stmt->execute([$like, $like, $like]);
+    $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $clientes = $db->query("SELECT * FROM clientes ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
