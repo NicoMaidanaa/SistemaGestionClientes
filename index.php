@@ -103,7 +103,7 @@ if ($busqueda !== '') {
             font-family: 'Segoe UI', sans-serif;
             background: #f0f2f5;
             padding: 20px;
-            color: #333;
+            color: #cd1e1e;
         }
 
         .container {
